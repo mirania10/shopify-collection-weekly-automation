@@ -5,7 +5,6 @@ This repository contains an automated workflow for managing Shopify collections 
 ## Overview
 
 The automation script helps maintain up-to-date product collections by:
-
 - **Fetching new Shopify products** added within the last week
 - **Clearing existing manual collections** to remove outdated products
 - **Updating collections** with fresh, relevant products
@@ -66,3 +65,6 @@ Or set up automated scheduling using your preferred method.
 ## License
 
 This project is open source and available under the MIT License.
+
+---
+*GitHub Actions workflow testing.*
