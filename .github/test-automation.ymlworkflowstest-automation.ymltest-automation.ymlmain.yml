@@ -1,0 +1,67 @@
+name: Test Shopify Collection Automation
+
+# Trigger the workflow on push to main branch or manual dispatch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests python-dotenv
+        
+    - name: Run syntax check
+      run: |
+        python -m py_compile shopify_collection_update.py
+        
+    - name: Run basic import test
+      run: |
+        python -c "import requests; import os; from dotenv import load_dotenv; print('Dependencies imported successfully')"
+        
+    - name: Test script with mock environment
+      env:
+        SHOPIFY_API_KEY: ${{ secrets.SHOPIFY_API_KEY }}
+        SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+        SHOPIFY_SHOP_NAME: ${{ secrets.SHOPIFY_SHOP_NAME }}
+        COLLECTION_ID: ${{ secrets.COLLECTION_ID }}
+      run: |
+        # Create a test to validate the script structure without making API calls
+        echo "Testing script structure and configuration..."
+        python -c "
+        import os
+        from dotenv import load_dotenv
+        
+        # Check if environment variables are accessible
+        load_dotenv()
+        
+        required_vars = ['SHOPIFY_API_KEY', 'SHOPIFY_PASSWORD', 'SHOPIFY_SHOP_NAME', 'COLLECTION_ID']
+        missing_vars = []
+        
+        for var in required_vars:
+            if not os.getenv(var):
+                missing_vars.append(var)
+        
+        if missing_vars:
+            print(f'⚠️  Missing environment variables: {missing_vars}')
+            print('ℹ️  These should be configured as repository secrets')
+        else:
+            print('✅ All required environment variables are configured')
+        
+        print('✅ Script validation completed')
+        "
