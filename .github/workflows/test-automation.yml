@@ -1,0 +1,32 @@
+name: Test Automation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-shopify-automation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests python-dotenv
+    
+    - name: Run Shopify collection update
+      env:
+        SHOPIFY_API_KEY: ${{ secrets.SHOPIFY_API_KEY }}
+        SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+        SHOPIFY_SHOP_NAME: ${{ secrets.SHOPIFY_SHOP_NAME }}
+        COLLECTION_ID: ${{ secrets.COLLECTION_ID }}
+      run: |
+        python shopify_collection_update.py
